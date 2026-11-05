@@ -1,5 +1,5 @@
 /* Auto-generated from MCQ_Only_Question_Bank + User_Set_Assignment.md. Do not hand-edit question data; regenerate from source .md files instead.
-   Each assignment carries a unique 'code' (Exam Code, used for login), a 'team' label (5 groups of 7, Nov 30-Dec 4 2026, one group/day), and 'examDate' (YYYY-MM-DD, IST) — login is only accepted on that date within the configured time window. QA entry has examDate=null (any day). */
+   Each assignment carries a unique 'code' (Exam Code, used for login), a 'team' label (5 groups of 7, randomly shuffled, Nov 30-Dec 4 2026, one group/day), and 'examDate' (YYYY-MM-DD, IST) — login is only accepted on that date within the configured time window. QA entry has examDate=null (any day). */
 window.EXAM_CONFIG = {
   "apiBase": "https://script.google.com/macros/s/AKfycbw1skjEvREF4O3yCy8oJeTOjuEQgxY0TgZ7870nABk7GuMg66_-rxTjlUoTCkZa7eqb/exec",
   "examDurationMinutes": 60,
@@ -19,42 +19,42 @@ window.USER_ASSIGNMENTS = [
     "examDate": null
   },
   {
-    "name": "Aadesh Pol",
-    "email": "aadesh.pol@rrglobal.com",
-    "set": "Set_01",
-    "code": "RRCAD-98ER-TQ9V",
+    "name": "Prasad Patil",
+    "email": "prasad.patil@rrglobal.com",
+    "set": "Set_21",
+    "code": "RRCAD-9UQW-9C39",
     "team": "Group-1",
     "examDate": "2026-11-30"
   },
   {
-    "name": "Aditya Patil",
-    "email": "aditya.patil@rrglobal.com",
-    "set": "Set_02",
-    "code": "RRCAD-7SP5-N4UG",
+    "name": "Shubham Pandey",
+    "email": "shubham.pandey@rrglobal.com",
+    "set": "Set_32",
+    "code": "RRCAD-NSLP-URST",
     "team": "Group-1",
     "examDate": "2026-11-30"
   },
   {
-    "name": "Aditya Patil1",
-    "email": "aditya.patil1@rrglobal.com",
-    "set": "Set_03",
-    "code": "RRCAD-4VWC-NP6N",
+    "name": "Ramesh Jarali",
+    "email": "ramesh.jarali@rrglobal.com",
+    "set": "Set_26",
+    "code": "RRCAD-9EET-L84N",
     "team": "Group-1",
     "examDate": "2026-11-30"
   },
   {
-    "name": "Aditya Tharkude",
-    "email": "aditya.tharkude@rrglobal.com",
-    "set": "Set_04",
-    "code": "RRCAD-2F3N-8EZC",
+    "name": "Vaibhav More",
+    "email": "vaibhav.more@rrglobal.com",
+    "set": "Set_35",
+    "code": "RRCAD-XFBB-B53M",
     "team": "Group-1",
     "examDate": "2026-11-30"
   },
   {
-    "name": "Aftab Shikalgar",
-    "email": "aftab.shikalgar@rrglobal.com",
-    "set": "Set_05",
-    "code": "RRCAD-S5AZ-5CSQ",
+    "name": "Onkar Mahadik",
+    "email": "onkar.mahadik@rrglobal.com",
+    "set": "Set_18",
+    "code": "RRCAD-894Z-3APT",
     "team": "Group-1",
     "examDate": "2026-11-30"
   },
@@ -67,34 +67,34 @@ window.USER_ASSIGNMENTS = [
     "examDate": "2026-11-30"
   },
   {
-    "name": "Akash Salve",
-    "email": "akash.salve@rrglobal1.onmicrosoft.com",
-    "set": "Set_07",
-    "code": "RRCAD-HZ5A-SM6S",
+    "name": "Rupesh Waghmare",
+    "email": "rupesh.waghmare@rrglobal.com",
+    "set": "Set_29",
+    "code": "RRCAD-62PY-7C8K",
     "team": "Group-1",
     "examDate": "2026-11-30"
-  },
-  {
-    "name": "Akhilesh Dhole",
-    "email": "akhilesh.dhole@rrglobal.com",
-    "set": "Set_08",
-    "code": "RRCAD-KMFG-6X94",
-    "team": "Group-2",
-    "examDate": "2026-12-01"
-  },
-  {
-    "name": "Amol Bhagwan Patil",
-    "email": "amol.patil@rrglobal.com",
-    "set": "Set_09",
-    "code": "RRCAD-ADXE-WC2C",
-    "team": "Group-2",
-    "examDate": "2026-12-01"
   },
   {
     "name": "Aniket Vanjari",
     "email": "aniket.vanjari@rrglobal.com",
     "set": "Set_10",
     "code": "RRCAD-W4VH-M56B",
+    "team": "Group-2",
+    "examDate": "2026-12-01"
+  },
+  {
+    "name": "Pranali Patil",
+    "email": "pranali.patil@rrglobal.com",
+    "set": "Set_20",
+    "code": "RRCAD-D7RT-2LC3",
+    "team": "Group-2",
+    "examDate": "2026-12-01"
+  },
+  {
+    "name": "Suraj Shashikant Patil",
+    "email": "suraj.patil@rrglobal.com",
+    "set": "Set_34",
+    "code": "RRCAD-8CJR-24VQ",
     "team": "Group-2",
     "examDate": "2026-12-01"
   },
@@ -107,130 +107,106 @@ window.USER_ASSIGNMENTS = [
     "examDate": "2026-12-01"
   },
   {
-    "name": "Digvijay Panbude",
-    "email": "digvijay.panbude@rrglobal.com",
-    "set": "Set_12",
-    "code": "RRCAD-SRZ4-AD73",
+    "name": "Akhilesh Dhole",
+    "email": "akhilesh.dhole@rrglobal.com",
+    "set": "Set_08",
+    "code": "RRCAD-KMFG-6X94",
     "team": "Group-2",
     "examDate": "2026-12-01"
   },
   {
-    "name": "Divesh Tulshidas Patil",
-    "email": "divesh.patil@rrglobal.com",
-    "set": "Set_13",
-    "code": "RRCAD-YGMY-YRUE",
+    "name": "Akash Salve",
+    "email": "akash.salve@rrglobal1.onmicrosoft.com",
+    "set": "Set_07",
+    "code": "RRCAD-HZ5A-SM6S",
     "team": "Group-2",
     "examDate": "2026-12-01"
-  },
-  {
-    "name": "Harshal Deshmukh",
-    "email": "harshal.deshmukh@rrglobal.com",
-    "set": "Set_14",
-    "code": "RRCAD-WP8W-WZ86",
-    "team": "Group-2",
-    "examDate": "2026-12-01"
-  },
-  {
-    "name": "Jagdish Bhogulkar",
-    "email": "jagdish.bhogulkar@rrglobal.com",
-    "set": "Set_15",
-    "code": "RRCAD-2G2J-KLSK",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Mohit Lohar",
-    "email": "mohit.lohar@rrglobal.com",
-    "set": "Set_16",
-    "code": "RRCAD-BYM5-9EUC",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Nilkanth Ghodvinde",
-    "email": "nilkanth.ghodvinde@rrglobal.com",
-    "set": "Set_17",
-    "code": "RRCAD-UQ7E-GD8W",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Onkar Mahadik",
-    "email": "onkar.mahadik@rrglobal.com",
-    "set": "Set_18",
-    "code": "RRCAD-894Z-3APT",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Prajwal Omble",
-    "email": "prajwal.omble@rrglobal.com",
-    "set": "Set_19",
-    "code": "RRCAD-N2ZY-B22Z",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Pranali Patil",
-    "email": "pranali.patil@rrglobal.com",
-    "set": "Set_20",
-    "code": "RRCAD-D7RT-2LC3",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Prasad Patil",
-    "email": "prasad.patil@rrglobal.com",
-    "set": "Set_21",
-    "code": "RRCAD-9UQW-9C39",
-    "team": "Group-3",
-    "examDate": "2026-12-02"
-  },
-  {
-    "name": "Premkumar Kengar",
-    "email": "premkumar.kengar@rrglobal.com",
-    "set": "Set_22",
-    "code": "RRCAD-YW5V-2LQ9",
-    "team": "Group-4",
-    "examDate": "2026-12-03"
   },
   {
     "name": "Priyansh Shrivastava",
     "email": "priyansh.shrivastava@rrglobal.com",
     "set": "Set_23",
     "code": "RRCAD-T3TZ-E3ZD",
-    "team": "Group-4",
-    "examDate": "2026-12-03"
+    "team": "Group-2",
+    "examDate": "2026-12-01"
   },
   {
-    "name": "Rahil Pirjade",
-    "email": "rahil.pirjade@rrglobal.com",
-    "set": "Set_24",
-    "code": "RRCAD-SH9Q-8WX6",
-    "team": "Group-4",
-    "examDate": "2026-12-03"
+    "name": "Amol Bhagwan Patil",
+    "email": "amol.patil@rrglobal.com",
+    "set": "Set_09",
+    "code": "RRCAD-ADXE-WC2C",
+    "team": "Group-3",
+    "examDate": "2026-12-02"
+  },
+  {
+    "name": "Rushikesh Rajput",
+    "email": "rushikesh.rajput@rrglobal.com",
+    "set": "Set_30",
+    "code": "RRCAD-QT5J-RDNT",
+    "team": "Group-3",
+    "examDate": "2026-12-02"
+  },
+  {
+    "name": "Sujal Patil",
+    "email": "sujal.patil@rrglobal.com",
+    "set": "Set_33",
+    "code": "RRCAD-UTQM-VMSP",
+    "team": "Group-3",
+    "examDate": "2026-12-02"
   },
   {
     "name": "Rahul M Patil",
     "email": "rahulm.patil@rrglobal.com",
     "set": "Set_25",
     "code": "RRCAD-49AS-L6PT",
-    "team": "Group-4",
-    "examDate": "2026-12-03"
-  },
-  {
-    "name": "Ramesh Jarali",
-    "email": "ramesh.jarali@rrglobal.com",
-    "set": "Set_26",
-    "code": "RRCAD-9EET-L84N",
-    "team": "Group-4",
-    "examDate": "2026-12-03"
+    "team": "Group-3",
+    "examDate": "2026-12-02"
   },
   {
     "name": "Roshan Mhase",
     "email": "roshan.mhase@rrglobal.com",
     "set": "Set_27",
     "code": "RRCAD-8Y6V-E5QF",
+    "team": "Group-3",
+    "examDate": "2026-12-02"
+  },
+  {
+    "name": "Harshal Deshmukh",
+    "email": "harshal.deshmukh@rrglobal.com",
+    "set": "Set_14",
+    "code": "RRCAD-WP8W-WZ86",
+    "team": "Group-3",
+    "examDate": "2026-12-02"
+  },
+  {
+    "name": "Aditya Tharkude",
+    "email": "aditya.tharkude@rrglobal.com",
+    "set": "Set_04",
+    "code": "RRCAD-2F3N-8EZC",
+    "team": "Group-3",
+    "examDate": "2026-12-02"
+  },
+  {
+    "name": "Aditya Patil1",
+    "email": "aditya.patil1@rrglobal.com",
+    "set": "Set_03",
+    "code": "RRCAD-4VWC-NP6N",
+    "team": "Group-4",
+    "examDate": "2026-12-03"
+  },
+  {
+    "name": "Nilkanth Ghodvinde",
+    "email": "nilkanth.ghodvinde@rrglobal.com",
+    "set": "Set_17",
+    "code": "RRCAD-UQ7E-GD8W",
+    "team": "Group-4",
+    "examDate": "2026-12-03"
+  },
+  {
+    "name": "Mohit Lohar",
+    "email": "mohit.lohar@rrglobal.com",
+    "set": "Set_16",
+    "code": "RRCAD-BYM5-9EUC",
     "team": "Group-4",
     "examDate": "2026-12-03"
   },
@@ -243,58 +219,82 @@ window.USER_ASSIGNMENTS = [
     "examDate": "2026-12-03"
   },
   {
-    "name": "Rupesh Waghmare",
-    "email": "rupesh.waghmare@rrglobal.com",
-    "set": "Set_29",
-    "code": "RRCAD-62PY-7C8K",
-    "team": "Group-5",
-    "examDate": "2026-12-04"
-  },
-  {
-    "name": "Rushikesh Rajput",
-    "email": "rushikesh.rajput@rrglobal.com",
-    "set": "Set_30",
-    "code": "RRCAD-QT5J-RDNT",
-    "team": "Group-5",
-    "examDate": "2026-12-04"
+    "name": "Premkumar Kengar",
+    "email": "premkumar.kengar@rrglobal.com",
+    "set": "Set_22",
+    "code": "RRCAD-YW5V-2LQ9",
+    "team": "Group-4",
+    "examDate": "2026-12-03"
   },
   {
     "name": "Ruturaj Yadav",
     "email": "ruturaj.yadav@rrglobal.com",
     "set": "Set_31",
     "code": "RRCAD-L6HM-UMJA",
+    "team": "Group-4",
+    "examDate": "2026-12-03"
+  },
+  {
+    "name": "Aadesh Pol",
+    "email": "aadesh.pol@rrglobal.com",
+    "set": "Set_01",
+    "code": "RRCAD-98ER-TQ9V",
+    "team": "Group-4",
+    "examDate": "2026-12-03"
+  },
+  {
+    "name": "Jagdish Bhogulkar",
+    "email": "jagdish.bhogulkar@rrglobal.com",
+    "set": "Set_15",
+    "code": "RRCAD-2G2J-KLSK",
     "team": "Group-5",
     "examDate": "2026-12-04"
   },
   {
-    "name": "Shubham Pandey",
-    "email": "shubham.pandey@rrglobal.com",
-    "set": "Set_32",
-    "code": "RRCAD-NSLP-URST",
+    "name": "Rahil Pirjade",
+    "email": "rahil.pirjade@rrglobal.com",
+    "set": "Set_24",
+    "code": "RRCAD-SH9Q-8WX6",
     "team": "Group-5",
     "examDate": "2026-12-04"
   },
   {
-    "name": "Sujal Patil",
-    "email": "sujal.patil@rrglobal.com",
-    "set": "Set_33",
-    "code": "RRCAD-UTQM-VMSP",
+    "name": "Aftab Shikalgar",
+    "email": "aftab.shikalgar@rrglobal.com",
+    "set": "Set_05",
+    "code": "RRCAD-S5AZ-5CSQ",
     "team": "Group-5",
     "examDate": "2026-12-04"
   },
   {
-    "name": "Suraj Shashikant Patil",
-    "email": "suraj.patil@rrglobal.com",
-    "set": "Set_34",
-    "code": "RRCAD-8CJR-24VQ",
+    "name": "Aditya Patil",
+    "email": "aditya.patil@rrglobal.com",
+    "set": "Set_02",
+    "code": "RRCAD-7SP5-N4UG",
     "team": "Group-5",
     "examDate": "2026-12-04"
   },
   {
-    "name": "Vaibhav More",
-    "email": "vaibhav.more@rrglobal.com",
-    "set": "Set_35",
-    "code": "RRCAD-XFBB-B53M",
+    "name": "Digvijay Panbude",
+    "email": "digvijay.panbude@rrglobal.com",
+    "set": "Set_12",
+    "code": "RRCAD-SRZ4-AD73",
+    "team": "Group-5",
+    "examDate": "2026-12-04"
+  },
+  {
+    "name": "Divesh Tulshidas Patil",
+    "email": "divesh.patil@rrglobal.com",
+    "set": "Set_13",
+    "code": "RRCAD-YGMY-YRUE",
+    "team": "Group-5",
+    "examDate": "2026-12-04"
+  },
+  {
+    "name": "Prajwal Omble",
+    "email": "prajwal.omble@rrglobal.com",
+    "set": "Set_19",
+    "code": "RRCAD-N2ZY-B22Z",
     "team": "Group-5",
     "examDate": "2026-12-04"
   }
