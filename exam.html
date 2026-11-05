@@ -194,7 +194,7 @@
     <div class="row" style="margin-top:22px;">
       <button class="btn block" id="btnStart">Begin Exam</button>
     </div>
-    <p class="hint">Once you begin, a 60-minute timer starts and cannot be paused. Do not close this tab until you submit.</p>
+    <p class="hint" id="loginWindowHint">Once you begin, a 60-minute timer starts and cannot be paused. Do not close this tab until you submit.</p>
   </section>
 
   <!-- EXAM -->
@@ -253,6 +253,34 @@
   var ASSIGNMENTS = window.USER_ASSIGNMENTS || [];
   var DURATION_MIN = CONFIG.examDurationMinutes || 60;
   var PASS_PCT = CONFIG.passPercent || 70;
+
+  // ---------------- login window (IST, time-of-day only) ----------------
+  var LOGIN_WINDOW_START_MIN = (CONFIG.loginWindowStartHourIST != null ? CONFIG.loginWindowStartHourIST : 11) * 60
+    + (CONFIG.loginWindowStartMinuteIST || 0);
+  var LOGIN_WINDOW_END_MIN = LOGIN_WINDOW_START_MIN + (CONFIG.loginWindowDurationMinutes || 30);
+  var LOGIN_WINDOW_LABEL = (function(){
+    function fmt(totalMin){
+      var h = Math.floor(totalMin/60), m = totalMin%60;
+      var ampm = h < 12 ? 'AM' : 'PM';
+      var h12 = h % 12; if (h12 === 0) h12 = 12;
+      return h12 + (m ? ':' + (m<10?'0':'')+m : ':00') + ' ' + ampm;
+    }
+    return fmt(LOGIN_WINDOW_START_MIN) + '–' + fmt(LOGIN_WINDOW_END_MIN);
+  })();
+
+  function nowISTMinutesSinceMidnight(){
+    var parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit'
+    }).formatToParts(new Date());
+    var h = parseInt(parts.find(function(p){return p.type==='hour';}).value, 10);
+    var m = parseInt(parts.find(function(p){return p.type==='minute';}).value, 10);
+    return h*60 + m;
+  }
+
+  function isWithinLoginWindow(){
+    var nowMin = nowISTMinutesSinceMidnight();
+    return nowMin >= LOGIN_WINDOW_START_MIN && nowMin < LOGIN_WINDOW_END_MIN;
+  }
 
   var screens = {
     blocked: document.getElementById('screen-blocked'),
@@ -452,6 +480,14 @@
       setLoginError('That exam code and email do not match our records. Check with the CAD Automation team if you believe this is an error.');
       return;
     }
+
+    var localProgress = loadProgress(email);
+    var isResuming = localProgress && !localProgress.done;
+    if (!isResuming && !isWithinLoginWindow()){
+      setLoginError('Login is only open from ' + LOGIN_WINDOW_LABEL + ' IST. You are outside this window and cannot start the exam.');
+      return;
+    }
+
     setLoginError(null);
 
     var btn = document.getElementById('btnStart');
@@ -686,6 +722,9 @@
   }
 
   // ---------------- init ----------------
+  document.getElementById('loginWindowHint').textContent =
+    'Login is only open ' + LOGIN_WINDOW_LABEL + ' IST. Once you begin, a 60-minute timer starts and cannot be paused.';
+
   runMachineGate(function(){ show('login'); });
 
 })();
