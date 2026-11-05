@@ -147,6 +147,18 @@
   .banner.ok{background:rgba(26,127,78,.1); color:var(--good); border:1px solid rgba(26,127,78,.35);}
   footer{text-align:center; font-size:11.5px; color:var(--text-dim); padding:14px; }
   [hidden]{display:none !important;}
+  .review-item{border:1px solid var(--border); border-radius:10px; padding:14px; margin-top:10px; background:var(--surface-2);}
+  .review-item.correct{border-left:4px solid var(--good);}
+  .review-item.wrong{border-left:4px solid var(--bad);}
+  .review-item.skipped{border-left:4px solid var(--text-dim);}
+  .review-item .rq{font-weight:700; margin-bottom:8px;}
+  .review-item .ra{font-size:13.5px; margin:3px 0;}
+  .review-item .ra.your-wrong{color:var(--bad);}
+  .review-item .ra.correct-ans{color:var(--good); font-weight:600;}
+  .review-item .tag{display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; padding:2px 8px; border-radius:20px; margin-left:8px;}
+  .review-item.correct .tag{background:rgba(26,127,78,.12); color:var(--good);}
+  .review-item.wrong .tag{background:rgba(194,42,42,.12); color:var(--bad);}
+  .review-item.skipped .tag{background:var(--surface); color:var(--text-dim);}
   @media (max-width:480px){
     .card{padding:20px 16px;}
     .result-grid{grid-template-columns:1fr 1fr;}
@@ -283,6 +295,9 @@
     </div>
     <div id="submitBanner"></div>
     <p class="hint" style="text-align:center;">Your result has been recorded for <strong id="resultEmail"></strong>. You may now close this tab.</p>
+    <h2 style="margin-top:28px;">Answer Review</h2>
+    <p class="hint">Review your answers below so you can prepare for your next scheduled exam.</p>
+    <div id="answerReview"></div>
   </section>
 
 </main>
@@ -602,6 +617,12 @@
     document.getElementById('statTime').textContent = result.durationLabel || '—';
     document.getElementById('resultEmail').textContent = result.email || document.getElementById('inEmail').value;
     document.getElementById('submitBanner').innerHTML = '<div class="banner warn">A record for this email already exists. Only one attempt is permitted per person.</div>';
+
+    var answers = result.answers;
+    if (!answers && result.answersJson){
+      try{ answers = JSON.parse(result.answersJson); }catch(e){ answers = null; }
+    }
+    renderAnswerReview(result.set, normEmail(result.email || document.getElementById('inEmail').value), answers);
   }
 
   // ---------------- exam runner ----------------
@@ -789,6 +810,41 @@
     if (autoSubmitted){
       document.getElementById('submitBanner').innerHTML += '<div class="banner warn">Time expired — your exam was submitted automatically.</div>';
     }
+    renderAnswerReview(result.set, normEmail(result.email), result.answers);
+  }
+
+  var LETTERS = ['A','B','C','D','E','F'];
+
+  function renderAnswerReview(setId, email, answers){
+    var container = document.getElementById('answerReview');
+    container.innerHTML = '';
+    if (!setId || !answers){
+      container.innerHTML = '<p class="hint">Answer review is not available for this result.</p>';
+      return;
+    }
+    var questions = buildExamQuestions(setId, email);
+    questions.forEach(function(q, i){
+      var userIdx = (answers[i] === undefined ? null : answers[i]);
+      var isSkipped = (userIdx === null || userIdx === undefined);
+      var isCorrect = !isSkipped && userIdx === q.correctIndex;
+      var status = isSkipped ? 'skipped' : (isCorrect ? 'correct' : 'wrong');
+      var tagText = isSkipped ? 'Unanswered' : (isCorrect ? 'Correct' : 'Incorrect');
+
+      var div = document.createElement('div');
+      div.className = 'review-item ' + status;
+
+      var html = '<div class="rq">Q' + (i+1) + '. ' + escapeHtml(q.q) + '<span class="tag">' + tagText + '</span></div>';
+      if (!isSkipped){
+        html += '<div class="ra' + (isCorrect ? '' : ' your-wrong') + '">Your answer: ' + LETTERS[userIdx] + '. ' + escapeHtml(q.options[userIdx]) + '</div>';
+      } else {
+        html += '<div class="ra your-wrong">Your answer: — (not answered)</div>';
+      }
+      if (!isCorrect){
+        html += '<div class="ra correct-ans">Correct answer: ' + LETTERS[q.correctIndex] + '. ' + escapeHtml(q.options[q.correctIndex]) + '</div>';
+      }
+      div.innerHTML = html;
+      container.appendChild(div);
+    });
   }
 
   // ---------------- init ----------------
