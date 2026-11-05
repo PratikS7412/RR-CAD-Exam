@@ -344,7 +344,7 @@
     try{
       localStorage.setItem(storageKey(state.email), JSON.stringify({
         name: state.name, examCode: state.examCode, email: state.email,
-        set: state.set, answers: state.answers, startedAt: state.startedAt,
+        set: state.set, team: state.team, answers: state.answers, startedAt: state.startedAt,
         deadline: state.deadline, done: !!state.done, result: state.result || null
       }));
     }catch(e){}
@@ -477,6 +477,7 @@
         examCode: examCode,
         email: email,
         set: assignment.set,
+        team: assignment.team,
         resume: (local && !local.done) ? local : null
       });
       btn.disabled = false; btn.textContent = 'Begin Exam';
@@ -505,7 +506,7 @@
     if (opts.resume){
       state = {
         name: opts.resume.name, examCode: opts.resume.examCode, email: opts.resume.email,
-        set: opts.resume.set,
+        set: opts.resume.set, team: opts.resume.team,
         questions: buildExamQuestions(opts.resume.set, normEmail(opts.resume.email)),
         answers: opts.resume.answers || [],
         startedAt: opts.resume.startedAt,
@@ -515,7 +516,7 @@
       var now = Date.now();
       state = {
         name: opts.name, examCode: opts.examCode, email: opts.email,
-        set: opts.set,
+        set: opts.set, team: opts.team,
         questions: buildExamQuestions(opts.set, normEmail(opts.email)),
         answers: new Array((SETS[opts.set]||[]).length).fill(null),
         startedAt: now,
@@ -638,7 +639,7 @@
 
     var result = {
       name: state.name, examCode: state.examCode, email: normEmail(state.email),
-      set: state.set, total: total, correct: correct, wrong: wrong, unanswered: unanswered,
+      set: state.set, team: state.team, total: total, correct: correct, wrong: wrong, unanswered: unanswered,
       percent: percent, pass: percent >= PASS_PCT,
       startedAt: state.startedAt, submittedAt: Date.now(), durationSeconds: durationSec,
       durationLabel: durationLabel, autoSubmitted: !!autoSubmitted,
