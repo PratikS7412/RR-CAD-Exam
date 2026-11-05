@@ -197,7 +197,7 @@
     <datalist id="rosterNames"></datalist>
 
     <label for="inExamCode">Exam Code</label>
-    <input type="text" id="inExamCode" placeholder="e.g. RRCAD-XXXX-XXXX" autocomplete="off">
+    <input type="text" id="inExamCode" placeholder="Auto-filled from your name" autocomplete="off" readonly>
 
     <label for="inEmail">Email Address</label>
     <input type="email" id="inEmail" placeholder="Auto-filled from your name" autocomplete="email" readonly>
@@ -873,9 +873,8 @@
 
   document.getElementById('inName').addEventListener('input', function(){
     var match = findAssignmentByName(this.value);
-    if (match){
-      document.getElementById('inEmail').value = match.email;
-    }
+    document.getElementById('inEmail').value = match ? match.email : '';
+    document.getElementById('inExamCode').value = match ? match.code : '';
   });
 
   // ---------------- schedule lookup ----------------
