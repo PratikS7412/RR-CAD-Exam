@@ -116,7 +116,7 @@ window.USER_ASSIGNMENTS = [
   },
   {
     "name": "Akash Salve",
-    "email": "akash.salve@rrglobal1.onmicrosoft.com",
+    "email": "akash.salve@rrglobal.com",
     "set": "Set_07",
     "code": "RRCAD-HZ5A-SM6S",
     "team": "Group-2",
