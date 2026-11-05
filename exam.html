@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RR CAD Automation Exam</title>
+<style>
+  /* Layout concept: single-card app shell, one focal panel at a time (login -> exam -> result) */
+  :root{
+    --bg:#f3f4f7;
+    --surface:#ffffff;
+    --surface-2:#f8f9fb;
+    --border:#dde1e8;
+    --text:#1b2130;
+    --text-dim:#5c6478;
+    --accent:#1d4ed8;
+    --accent-2:#0f2a6b;
+    --good:#1a7f4e;
+    --bad:#c22a2a;
+    --warn:#a8650f;
+    --shadow: 0 1px 3px rgba(20,24,40,.08), 0 8px 24px -8px rgba(20,24,40,.12);
+    color-scheme: light;
+  }
+  /* Light theme only — intentionally not following system dark mode */
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  .topbar{
+    padding:14px max(16px,env(safe-area-inset-left,0px)) 14px max(16px,env(safe-area-inset-right,0px));
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    background:var(--surface);
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px;}
+  .brand .mark{
+    height:37.5px; width:auto; max-width:150px; object-fit:contain;
+    background:#fff; border-radius:6px; padding:3px 6px;
+  }
+  .brand small{display:block;font-weight:500;color:var(--text-dim);font-size:11px;letter-spacing:.3px;}
+  main{
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:28px max(16px,env(safe-area-inset-left,0px)) 48px max(16px,env(safe-area-inset-right,0px));
+  }
+  .card{
+    width:100%;
+    max-width:640px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:28px;
+  }
+  .card.wide{max-width:760px;}
+  h1{font-size:20px;margin:0 0 4px;}
+  h2{font-size:16px;margin:0 0 14px;color:var(--text-dim);font-weight:600;}
+  p.lead{color:var(--text-dim); margin:0 0 20px; font-size:13.5px;}
+  label{display:block; font-size:12.5px; font-weight:600; color:var(--text-dim); margin:16px 0 6px; letter-spacing:.2px;}
+  label:first-of-type{margin-top:0;}
+  input[type=text], input[type=email]{
+    width:100%; padding:11px 12px; border-radius:9px;
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+    font-size:14.5px; outline:none;
+  }
+  input:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(91,140,255,.18);}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:11px 20px; border-radius:9px; border:1px solid transparent;
+    background:var(--accent); color:#fff; font-weight:700; font-size:14px;
+    cursor:pointer; transition:filter .15s ease;
+  }
+  .btn:hover{filter:brightness(1.07);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .btn.secondary{background:transparent; color:var(--text); border-color:var(--border);}
+  .btn.block{width:100%;}
+  .row{display:flex; gap:10px;}
+  .row > *{flex:1;}
+  .error-box{
+    margin-top:16px; padding:11px 13px; border-radius:9px;
+    background:rgba(194,42,42,.1); border:1px solid rgba(194,42,42,.35); color:var(--bad);
+    font-size:13px; font-weight:600; display:none;
+  }
+  .error-box.show{display:block;}
+  .hint{font-size:12px;color:var(--text-dim); margin-top:18px;}
+  /* Exam header */
+  .exam-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:18px; flex-wrap:wrap;
+  }
+  .meta{font-size:12.5px; color:var(--text-dim);}
+  .meta strong{color:var(--text);}
+  .timer{
+    font-variant-numeric:tabular-nums;
+    font-weight:800; font-size:15px; padding:6px 12px; border-radius:8px;
+    background:var(--surface-2); border:1px solid var(--border);
+  }
+  .timer.low{color:var(--bad); border-color:var(--bad);}
+  .progressbar{height:6px; border-radius:4px; background:var(--surface-2); overflow:hidden; margin:4px 0 22px;}
+  .progressbar > div{height:100%; background:var(--accent); transition:width .25s ease;}
+  .qnum{font-size:12px; font-weight:700; color:var(--accent); letter-spacing:.4px; text-transform:uppercase;}
+  .qtext{font-size:16.5px; font-weight:600; margin:8px 0 18px; line-height:1.45;}
+  .opt{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:12px 14px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface-2); margin-bottom:10px; cursor:pointer;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.selected{border-color:var(--accent); background:rgba(91,140,255,.12);}
+  .opt input{margin-top:2px; accent-color:var(--accent); flex-shrink:0;}
+  .opt .lbl{font-weight:700; color:var(--text-dim); width:18px; flex-shrink:0;}
+  .nav-row{display:flex; justify-content:space-between; align-items:center; margin-top:22px; gap:10px;}
+  .dots{display:flex; flex-wrap:wrap; gap:6px; margin:18px 0 0; max-height:88px; overflow-y:auto; padding:2px;}
+  .dot{
+    width:30px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center;
+    font-size:11.5px; font-weight:700; border:1px solid var(--border); background:var(--surface-2); color:var(--text-dim);
+    cursor:pointer;
+  }
+  .dot.answered{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .dot.current{outline:2px solid var(--accent); outline-offset:1px;}
+  /* Result */
+  .score-ring{
+    width:132px; height:132px; border-radius:50%; margin:6px auto 18px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    border:10px solid var(--surface-2); position:relative;
+  }
+  .score-ring .pct{font-size:28px; font-weight:800;}
+  .score-ring .label{font-size:11px; color:var(--text-dim); font-weight:600;}
+  .pass{color:var(--good);}
+  .fail{color:var(--bad);}
+  .result-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0;}
+  .stat{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:12px;}
+  .stat .n{font-size:19px; font-weight:800;}
+  .stat .t{font-size:11.5px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:.3px;}
+  .banner{padding:10px 13px; border-radius:9px; font-size:13px; font-weight:600; margin-top:14px;}
+  .banner.warn{background:rgba(168,101,15,.12); color:var(--warn); border:1px solid rgba(168,101,15,.35);}
+  .banner.ok{background:rgba(26,127,78,.1); color:var(--good); border:1px solid rgba(26,127,78,.35);}
+  footer{text-align:center; font-size:11.5px; color:var(--text-dim); padding:14px; }
+  [hidden]{display:none !important;}
+  @media (max-width:480px){
+    .card{padding:20px 16px;}
+    .result-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img class="mark" src="logo.png" alt="RR Global">
+    <div>
+      RR CAD Automation Exam
+      <small>CAD Automation Certification</small>
+    </div>
+  </div>
+  <div class="meta" id="topbarMeta"></div>
+</div>
+
+<main>
+
+  <!-- BLOCKED (wrong device / server unreachable) -->
+  <section class="card" id="screen-blocked" hidden>
+    <h1 id="blockedTitle">Exam Unavailable</h1>
+    <p class="lead" id="blockedMsg"></p>
+    <p class="hint">Contact the CAD Automation team if you believe this is an error.</p>
+  </section>
+
+  <!-- LOGIN -->
+  <section class="card" id="screen-login" hidden>
+    <h1>Start Your Exam</h1>
+    <p class="lead">Enter your details exactly as registered. Your question set is assigned automatically — you cannot choose it. Each person gets one attempt.</p>
+
+    <label for="inName">Full Name</label>
+    <input type="text" id="inName" placeholder="e.g. Aditya Patil" autocomplete="name">
+
+    <label for="inEmpId">Employee ID</label>
+    <input type="text" id="inEmpId" placeholder="e.g. RR-1042" autocomplete="off">
+
+    <label for="inEmail">Email Address</label>
+    <input type="email" id="inEmail" placeholder="e.g. aditya.patil@rrglobal.com" autocomplete="email">
+
+    <div class="error-box" id="loginError"></div>
+
+    <div class="row" style="margin-top:22px;">
+      <button class="btn block" id="btnStart">Begin Exam</button>
+    </div>
+    <p class="hint">Once you begin, a 60-minute timer starts and cannot be paused. Do not close this tab until you submit.</p>
+  </section>
+
+  <!-- EXAM -->
+  <section class="card wide" id="screen-exam" hidden>
+    <div class="exam-head">
+      <div class="meta">
+        <strong id="examUserName"></strong>
+      </div>
+      <div class="timer" id="timerDisplay">60:00</div>
+    </div>
+    <div class="progressbar"><div id="progressFill" style="width:0%"></div></div>
+
+    <div class="qnum" id="qnumLabel">Question 1 of 50</div>
+    <div class="qtext" id="qtext"></div>
+    <div id="optsWrap"></div>
+
+    <div class="nav-row">
+      <button class="btn secondary" id="btnPrev">← Previous</button>
+      <span class="meta" id="answeredCount"></span>
+      <button class="btn" id="btnNext">Next →</button>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn" id="btnSubmit" style="background:var(--good);">Submit Exam</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="card" id="screen-result" hidden>
+    <h1 style="text-align:center;">Exam Submitted</h1>
+    <div class="score-ring" id="scoreRing">
+      <div class="pct" id="scorePct">--%</div>
+      <div class="label">SCORE</div>
+    </div>
+    <p style="text-align:center; font-weight:700;" id="resultVerdict"></p>
+    <div class="result-grid">
+      <div class="stat"><div class="n" id="statCorrect">0</div><div class="t">Correct</div></div>
+      <div class="stat"><div class="n" id="statWrong">0</div><div class="t">Incorrect</div></div>
+      <div class="stat"><div class="n" id="statUnanswered">0</div><div class="t">Unanswered</div></div>
+      <div class="stat"><div class="n" id="statTime">--</div><div class="t">Time Used</div></div>
+    </div>
+    <div id="submitBanner"></div>
+    <p class="hint" style="text-align:center;">Your result has been recorded for <strong id="resultEmail"></strong>. You may now close this tab.</p>
+  </section>
+
+</main>
+
+<footer>RR Global — CAD Automation Team · Internal Use Only</footer>
+
+<script src="exam_data.js"></script>
+<script>
+(function(){
+  "use strict";
+  var CONFIG = window.EXAM_CONFIG || {};
+  var SETS = window.EXAM_SETS || {};
+  var ASSIGNMENTS = window.USER_ASSIGNMENTS || [];
+  var DURATION_MIN = CONFIG.examDurationMinutes || 60;
+  var PASS_PCT = CONFIG.passPercent || 70;
+
+  var screens = {
+    blocked: document.getElementById('screen-blocked'),
+    login: document.getElementById('screen-login'),
+    exam: document.getElementById('screen-exam'),
+    result: document.getElementById('screen-result')
+  };
+  function show(name){
+    Object.keys(screens).forEach(function(k){ screens[k].hidden = (k !== name); });
+  }
+
+  function normEmail(e){ return (e||'').trim().toLowerCase(); }
+
+  // ---------------- machine gate: desktop only ----------------
+  function isDesktopDevice(){
+    // UA sniffing only — pointer/hover media queries are unreliable inside
+    // embedded webviews (VS Code's own browser, some kiosk browsers) and
+    // produced false positives there. This still blocks real phones/tablets.
+    var ua = navigator.userAgent || '';
+    var mobileUA = /Android|iPhone|iPad|iPod|Windows Phone|BlackBerry|IEMobile|Opera Mini|Mobile(?!.*Windows NT)/i.test(ua);
+    return !mobileUA;
+  }
+
+  var DEBUG_GATE = /[?&]debug=1\b/.test(location.search);
+
+  function blockExam(reason, detail){
+    document.getElementById('blockedMsg').textContent = 'You cannot take this exam on this machine.';
+    if (DEBUG_GATE){
+      document.getElementById('blockedMsg').textContent += ' [debug: ' + reason + (detail?(' — '+detail):'') + ']';
+    }
+    show('blocked');
+  }
+
+  function runMachineGate(cb){
+    if (!isDesktopDevice()){
+      blockExam('device_ua', navigator.userAgent);
+      return;
+    }
+    cb();
+  }
+
+  function findAssignment(email){
+    var e = normEmail(email);
+    for (var i=0;i<ASSIGNMENTS.length;i++){
+      if (ASSIGNMENTS[i].email === e) return ASSIGNMENTS[i];
+    }
+    return null;
+  }
+
+  // ---- seeded shuffle so a user's option order is stable across reloads ----
+  function seededRandom(seed){
+    var s = 0;
+    for (var i=0;i<seed.length;i++){ s = (s*31 + seed.charCodeAt(i)) >>> 0; }
+    return function(){
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+  function shuffleWithSeed(arr, rnd){
+    var a = arr.slice();
+    for (var i=a.length-1;i>0;i--){
+      var j = Math.floor(rnd()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  function buildExamQuestions(setId, seed){
+    var raw = SETS[setId] || [];
+    var rnd = seededRandom(seed + '|' + setId);
+    return raw.map(function(q, idx){
+      var order = shuffleWithSeed(q.options.map(function(_,i){return i;}), rnd);
+      var options = order.map(function(origIdx){ return q.options[origIdx]; });
+      var correctIndex = order.indexOf(q.answerIndex);
+      return { n: idx+1, q: q.q, options: options, correctIndex: correctIndex };
+    });
+  }
+
+  // ---------------- state ----------------
+  var state = null; // { name, employeeId, email, set, questions, answers[], startedAt, deadline }
+  var STORAGE_KEY_PREFIX = 'rrlisp_exam_v1_';
+
+  function storageKey(email){ return STORAGE_KEY_PREFIX + normEmail(email); }
+
+  function saveProgress(){
+    try{
+      localStorage.setItem(storageKey(state.email), JSON.stringify({
+        name: state.name, employeeId: state.employeeId, email: state.email,
+        set: state.set, answers: state.answers, startedAt: state.startedAt,
+        deadline: state.deadline, done: !!state.done, result: state.result || null
+      }));
+    }catch(e){}
+  }
+  function loadProgress(email){
+    try{
+      var raw = localStorage.getItem(storageKey(email));
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  // ---------------- server comms (Google Apps Script Web App) ----------------
+  // apiBase is the deployed Apps Script /exec URL. GET takes ?email=..., POST
+  // body is sent as text/plain (not application/json) so the browser skips
+  // the CORS preflight that Apps Script Web Apps can't answer.
+  function checkExistingOnServer(email, cb){
+    if (!CONFIG.apiBase){ cb(null); return; }
+    var url = CONFIG.apiBase + '?email=' + encodeURIComponent(normEmail(email));
+    fetch(url, {method:'GET'}).then(function(r){
+      if (!r.ok) throw new Error('bad_status');
+      return r.json();
+    }).then(function(d){
+      cb(d && d.found === false ? null : d);
+    }).catch(function(){ cb(null); });
+  }
+
+  function submitToServer(payload, cb){
+    if (!CONFIG.apiBase){ cb(false, 'no_server_configured'); return; }
+    fetch(CONFIG.apiBase, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      if (!r.ok) throw new Error('bad_status_'+r.status);
+      return r.json();
+    }).then(function(d){
+      if (d && d.ok) cb(true);
+      else if (d && d.error === 'already_submitted') cb(false, 'already_submitted');
+      else cb(false, 'server_error');
+    }).catch(function(err){ cb(false, 'network_error'); });
+  }
+
+  function queuePendingSubmission(payload){
+    try{
+      var q = JSON.parse(localStorage.getItem('rrlisp_pending_submissions') || '[]');
+      q.push(payload);
+      localStorage.setItem('rrlisp_pending_submissions', JSON.stringify(q));
+    }catch(e){}
+  }
+
+  function retryPendingSubmissions(){
+    if (!CONFIG.apiBase) return;
+    var q;
+    try{ q = JSON.parse(localStorage.getItem('rrlisp_pending_submissions') || '[]'); }catch(e){ q = []; }
+    if (!q.length) return;
+    var remaining = [];
+    var pending = q.length;
+    q.forEach(function(payload){
+      submitToServer(payload, function(ok){
+        if (!ok) remaining.push(payload);
+        pending--;
+        if (pending === 0){
+          try{ localStorage.setItem('rrlisp_pending_submissions', JSON.stringify(remaining)); }catch(e){}
+        }
+      });
+    });
+  }
+  retryPendingSubmissions();
+
+  function downloadResultFile(payload){
+    var blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'exam_result_' + normEmail(payload.email).replace(/[^a-z0-9]/g,'_') + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
+  // ---------------- login ----------------
+  var loginError = document.getElementById('loginError');
+  function setLoginError(msg){
+    if (!msg){ loginError.classList.remove('show'); loginError.textContent=''; return; }
+    loginError.textContent = msg;
+    loginError.classList.add('show');
+  }
+
+  document.getElementById('btnStart').addEventListener('click', function(){
+    var name = document.getElementById('inName').value.trim();
+    var empId = document.getElementById('inEmpId').value.trim();
+    var email = document.getElementById('inEmail').value.trim();
+
+    if (!name || !empId || !email){
+      setLoginError('Please fill in your name, employee ID, and email.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      setLoginError('Please enter a valid email address.');
+      return;
+    }
+    var assignment = findAssignment(email);
+    if (!assignment){
+      setLoginError('This email is not on the exam roster. Check with the CAD Automation team if you believe this is an error.');
+      return;
+    }
+    setLoginError(null);
+
+    var btn = document.getElementById('btnStart');
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+
+    checkExistingOnServer(email, function(existing){
+      var local = loadProgress(email);
+
+      if (existing && existing.submitted){
+        btn.disabled = false; btn.textContent = 'Begin Exam';
+        renderAlreadySubmitted(existing);
+        return;
+      }
+      if (local && local.done){
+        btn.disabled = false; btn.textContent = 'Begin Exam';
+        renderAlreadySubmitted(local.result || local);
+        return;
+      }
+
+      startExam({
+        name: name,
+        employeeId: empId,
+        email: email,
+        set: assignment.set,
+        resume: (local && !local.done) ? local : null
+      });
+      btn.disabled = false; btn.textContent = 'Begin Exam';
+    });
+  });
+
+  function renderAlreadySubmitted(result){
+    show('result');
+    document.getElementById('scoreRing').className = 'score-ring';
+    document.getElementById('scorePct').textContent = (result.percent != null ? result.percent : '--') + '%';
+    document.getElementById('resultVerdict').textContent = 'You have already completed this exam.';
+    document.getElementById('resultVerdict').className = '';
+    document.getElementById('statCorrect').textContent = result.correct != null ? result.correct : '—';
+    document.getElementById('statWrong').textContent = result.wrong != null ? result.wrong : '—';
+    document.getElementById('statUnanswered').textContent = result.unanswered != null ? result.unanswered : '—';
+    document.getElementById('statTime').textContent = result.durationLabel || '—';
+    document.getElementById('resultEmail').textContent = result.email || document.getElementById('inEmail').value;
+    document.getElementById('submitBanner').innerHTML = '<div class="banner warn">A record for this email already exists. Only one attempt is permitted per person.</div>';
+  }
+
+  // ---------------- exam runner ----------------
+  var currentIndex = 0;
+  var timerInterval = null;
+
+  function startExam(opts){
+    if (opts.resume){
+      state = {
+        name: opts.resume.name, employeeId: opts.resume.employeeId, email: opts.resume.email,
+        set: opts.resume.set,
+        questions: buildExamQuestions(opts.resume.set, normEmail(opts.resume.email)),
+        answers: opts.resume.answers || [],
+        startedAt: opts.resume.startedAt,
+        deadline: opts.resume.deadline
+      };
+    } else {
+      var now = Date.now();
+      state = {
+        name: opts.name, employeeId: opts.employeeId, email: opts.email,
+        set: opts.set,
+        questions: buildExamQuestions(opts.set, normEmail(opts.email)),
+        answers: new Array((SETS[opts.set]||[]).length).fill(null),
+        startedAt: now,
+        deadline: now + DURATION_MIN*60*1000
+      };
+    }
+    currentIndex = 0;
+    saveProgress();
+    document.getElementById('examUserName').textContent = state.name;
+    document.getElementById('topbarMeta').textContent = state.email;
+    show('exam');
+    renderQuestion();
+    startTimer();
+  }
+
+  function startTimer(){
+    if (timerInterval) clearInterval(timerInterval);
+    tickTimer();
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+  function tickTimer(){
+    var remainMs = state.deadline - Date.now();
+    var el = document.getElementById('timerDisplay');
+    if (remainMs <= 0){
+      el.textContent = '00:00';
+      clearInterval(timerInterval);
+      finishExam(true);
+      return;
+    }
+    var totalSec = Math.floor(remainMs/1000);
+    var m = Math.floor(totalSec/60), s = totalSec%60;
+    el.textContent = (m<10?'0':'')+m + ':' + (s<10?'0':'')+s;
+    el.classList.toggle('low', totalSec <= 120);
+  }
+
+  function renderQuestion(){
+    var q = state.questions[currentIndex];
+    document.getElementById('qnumLabel').textContent = 'Question ' + (currentIndex+1) + ' of ' + state.questions.length;
+    document.getElementById('qtext').textContent = q.q;
+    document.getElementById('progressFill').style.width = (((currentIndex+1)/state.questions.length)*100) + '%';
+
+    var wrap = document.getElementById('optsWrap');
+    wrap.innerHTML = '';
+    var letters = ['A','B','C','D','E','F'];
+    q.options.forEach(function(optText, i){
+      var div = document.createElement('label');
+      div.className = 'opt' + (state.answers[currentIndex] === i ? ' selected' : '');
+      div.innerHTML = '<input type="radio" name="opt" ' + (state.answers[currentIndex]===i?'checked':'') + '> <span class="lbl">' + letters[i] + '.</span> <span>' + escapeHtml(optText) + '</span>';
+      div.addEventListener('click', function(){
+        state.answers[currentIndex] = i;
+        saveProgress();
+        renderQuestion();
+      });
+      wrap.appendChild(div);
+    });
+
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    document.getElementById('btnNext').textContent = (currentIndex === state.questions.length-1) ? 'Last Question' : 'Next →';
+
+    var answeredCt = state.answers.filter(function(a){ return a !== null; }).length;
+    document.getElementById('answeredCount').textContent = answeredCt + ' / ' + state.questions.length + ' answered';
+
+    renderDots();
+  }
+
+  function renderDots(){
+    var dotsEl = document.getElementById('dots');
+    dotsEl.innerHTML = '';
+    state.questions.forEach(function(q, i){
+      var d = document.createElement('div');
+      d.className = 'dot' + (state.answers[i]!==null?' answered':'') + (i===currentIndex?' current':'');
+      d.textContent = i+1;
+      d.addEventListener('click', function(){ currentIndex = i; renderQuestion(); });
+      dotsEl.appendChild(d);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  document.getElementById('btnPrev').addEventListener('click', function(){
+    if (currentIndex > 0){ currentIndex--; renderQuestion(); }
+  });
+  document.getElementById('btnNext').addEventListener('click', function(){
+    if (currentIndex < state.questions.length-1){ currentIndex++; renderQuestion(); }
+  });
+  document.getElementById('btnSubmit').addEventListener('click', function(){
+    var unanswered = state.answers.filter(function(a){ return a===null; }).length;
+    var msg = unanswered > 0
+      ? unanswered + ' question(s) are unanswered. Submit anyway?'
+      : 'Submit your exam now? This cannot be undone.';
+    if (window.confirm(msg)) finishExam(false);
+  });
+
+  window.addEventListener('beforeunload', function(e){
+    if (state && !state.done){
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  function finishExam(autoSubmitted){
+    if (!state || state.done) return;
+    if (timerInterval) clearInterval(timerInterval);
+
+    var correct = 0, wrong = 0, unanswered = 0;
+    state.questions.forEach(function(q, i){
+      if (state.answers[i] === null) unanswered++;
+      else if (state.answers[i] === q.correctIndex) correct++;
+      else wrong++;
+    });
+    var total = state.questions.length;
+    var percent = Math.round((correct/total)*1000)/10;
+    var durationSec = Math.round((Date.now() - state.startedAt)/1000);
+    var dm = Math.floor(durationSec/60), ds = durationSec%60;
+    var durationLabel = dm + 'm ' + ds + 's';
+
+    var result = {
+      name: state.name, employeeId: state.employeeId, email: normEmail(state.email),
+      set: state.set, total: total, correct: correct, wrong: wrong, unanswered: unanswered,
+      percent: percent, pass: percent >= PASS_PCT,
+      startedAt: state.startedAt, submittedAt: Date.now(), durationSeconds: durationSec,
+      durationLabel: durationLabel, autoSubmitted: !!autoSubmitted,
+      answers: state.answers, submitted: true
+    };
+
+    state.done = true;
+    state.result = result;
+    saveProgress();
+
+    submitToServer(result, function(ok, errReason){
+      var bannerEl = document.getElementById('submitBanner');
+      if (ok){
+        bannerEl.innerHTML = '<div class="banner ok">Result successfully recorded on the exam server.</div>';
+      } else if (errReason === 'already_submitted'){
+        bannerEl.innerHTML = '<div class="banner warn">A result for this email was already on the server (saved locally too, not duplicated).</div>';
+      } else {
+        queuePendingSubmission(result);
+        downloadResultFile(result);
+        bannerEl.innerHTML = '<div class="banner warn">Could not reach the exam server. A backup result file was downloaded and will auto-retry next time this page loads.</div>';
+      }
+    });
+
+    renderResult(result, autoSubmitted);
+  }
+
+  function renderResult(result, autoSubmitted){
+    show('result');
+    var ring = document.getElementById('scoreRing');
+    ring.style.borderColor = result.pass ? 'var(--good)' : 'var(--bad)';
+    document.getElementById('scorePct').textContent = result.percent + '%';
+    document.getElementById('scorePct').className = 'pct ' + (result.pass?'pass':'fail');
+    var verdict = document.getElementById('resultVerdict');
+    verdict.textContent = result.pass ? 'Passed' : 'Not Passed';
+    verdict.className = result.pass ? 'pass' : 'fail';
+    document.getElementById('statCorrect').textContent = result.correct;
+    document.getElementById('statWrong').textContent = result.wrong;
+    document.getElementById('statUnanswered').textContent = result.unanswered;
+    document.getElementById('statTime').textContent = result.durationLabel;
+    document.getElementById('resultEmail').textContent = result.email;
+    if (autoSubmitted){
+      document.getElementById('submitBanner').innerHTML += '<div class="banner warn">Time expired — your exam was submitted automatically.</div>';
+    }
+  }
+
+  // ---------------- init ----------------
+  runMachineGate(function(){ show('login'); });
+
+})();
+</script>
+</body>
+</html>
