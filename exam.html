@@ -181,13 +181,14 @@
     <p class="lead">Enter your details exactly as registered. Your question set is assigned automatically — you cannot choose it. Each person gets one attempt.</p>
 
     <label for="inName">Full Name</label>
-    <input type="text" id="inName" placeholder="e.g. Aditya Patil" autocomplete="name">
+    <input type="text" id="inName" list="rosterNames" placeholder="e.g. Aditya Patil" autocomplete="name">
+    <datalist id="rosterNames"></datalist>
 
     <label for="inExamCode">Exam Code</label>
     <input type="text" id="inExamCode" placeholder="e.g. RRCAD-XXXX-XXXX" autocomplete="off">
 
     <label for="inEmail">Email Address</label>
-    <input type="email" id="inEmail" placeholder="e.g. aditya.patil@rrglobal.com" autocomplete="email">
+    <input type="email" id="inEmail" placeholder="Auto-filled from your name" autocomplete="email" readonly>
 
     <div class="error-box" id="loginError"></div>
 
@@ -195,6 +196,50 @@
       <button class="btn block" id="btnStart">Begin Exam</button>
     </div>
     <p class="hint" id="loginWindowHint">Once you begin, a 60-minute timer starts and cannot be paused. Do not close this tab until you submit.</p>
+
+    <div style="text-align:center; margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+      <button class="btn secondary" id="btnGoSchedule" type="button">Check My Group, Date &amp; Exam Code</button>
+    </div>
+  </section>
+
+  <!-- SCHEDULE LOOKUP -->
+  <section class="card" id="screen-schedule" hidden>
+    <h1>Check Your Schedule</h1>
+    <p class="lead">Enter your registered full name to see your assigned group, exam date, login window, and exam code.</p>
+
+    <label for="inScheduleName">Full Name</label>
+    <input type="text" id="inScheduleName" list="rosterNames" placeholder="e.g. Aditya Patil" autocomplete="name">
+
+    <div class="error-box" id="scheduleError"></div>
+
+    <div class="row" style="margin-top:22px;">
+      <button class="btn block" id="btnLookupSchedule">Look Up</button>
+    </div>
+
+    <div id="scheduleResult" hidden style="margin-top:20px;">
+      <label>Name</label>
+      <input type="text" id="schName" readonly>
+
+      <label>Group</label>
+      <input type="text" id="schGroup" readonly>
+
+      <label>Exam Date</label>
+      <input type="text" id="schDate" readonly>
+
+      <label>Login Window (IST)</label>
+      <input type="text" id="schWindow" readonly>
+
+      <label>Your Exam Code</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="schCode" readonly style="font-family:ui-monospace,Consolas,monospace; font-weight:700; letter-spacing:.5px;">
+        <button class="btn" id="btnCopyCode" type="button" style="flex:0 0 auto; padding:11px 16px;">Copy</button>
+      </div>
+      <p class="hint">Keep this code private. You will need it, along with your name and email, to log in on your scheduled date.</p>
+    </div>
+
+    <div style="text-align:center; margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+      <button class="btn secondary" id="btnBackToLogin" type="button">← Back to Login</button>
+    </div>
   </section>
 
   <!-- EXAM -->
@@ -304,6 +349,7 @@
   var screens = {
     blocked: document.getElementById('screen-blocked'),
     login: document.getElementById('screen-login'),
+    schedule: document.getElementById('screen-schedule'),
     exam: document.getElementById('screen-exam'),
     result: document.getElementById('screen-result')
   };
@@ -748,6 +794,95 @@
   // ---------------- init ----------------
   document.getElementById('loginWindowHint').textContent =
     'Login is only open ' + LOGIN_WINDOW_LABEL + ' IST. Once you begin, a 60-minute timer starts and cannot be paused.';
+
+  // ---------------- name lookup + roster datalist ----------------
+  function normName(n){ return (n||'').trim().toLowerCase(); }
+
+  function findAssignmentByName(name){
+    var n = normName(name);
+    for (var i=0;i<ASSIGNMENTS.length;i++){
+      if (normName(ASSIGNMENTS[i].name) === n) return ASSIGNMENTS[i];
+    }
+    return null;
+  }
+
+  (function populateRosterDatalist(){
+    var dl = document.getElementById('rosterNames');
+    ASSIGNMENTS.forEach(function(a){
+      var opt = document.createElement('option');
+      opt.value = a.name;
+      dl.appendChild(opt);
+    });
+  })();
+
+  document.getElementById('inName').addEventListener('input', function(){
+    var match = findAssignmentByName(this.value);
+    if (match){
+      document.getElementById('inEmail').value = match.email;
+    }
+  });
+
+  // ---------------- schedule lookup ----------------
+  var scheduleError = document.getElementById('scheduleError');
+  function setScheduleError(msg){
+    if (!msg){ scheduleError.classList.remove('show'); scheduleError.textContent=''; return; }
+    scheduleError.textContent = msg;
+    scheduleError.classList.add('show');
+  }
+
+  document.getElementById('btnGoSchedule').addEventListener('click', function(){
+    setScheduleError(null);
+    document.getElementById('scheduleResult').hidden = true;
+    document.getElementById('inScheduleName').value = document.getElementById('inName').value;
+    show('schedule');
+  });
+
+  document.getElementById('btnBackToLogin').addEventListener('click', function(){
+    show('login');
+  });
+
+  document.getElementById('btnLookupSchedule').addEventListener('click', function(){
+    var name = document.getElementById('inScheduleName').value.trim();
+    if (!name){
+      setScheduleError('Please enter your full name.');
+      document.getElementById('scheduleResult').hidden = true;
+      return;
+    }
+    var assignment = findAssignmentByName(name);
+    if (!assignment){
+      setScheduleError('This name is not on the exam roster. Check with the CAD Automation team if you believe this is an error.');
+      document.getElementById('scheduleResult').hidden = true;
+      return;
+    }
+    setScheduleError(null);
+    document.getElementById('schName').value = assignment.name;
+    document.getElementById('schGroup').value = assignment.team || '—';
+    document.getElementById('schDate').value = assignment.examDate ? formatDateLabel(assignment.examDate) : 'Any day';
+    document.getElementById('schWindow').value = LOGIN_WINDOW_LABEL;
+    document.getElementById('schCode').value = assignment.code;
+    document.getElementById('scheduleResult').hidden = false;
+  });
+
+  document.getElementById('btnCopyCode').addEventListener('click', function(){
+    var codeInput = document.getElementById('schCode');
+    var btn = document.getElementById('btnCopyCode');
+    var text = codeInput.value;
+    function showCopied(){
+      var original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(function(){ btn.textContent = original; }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopied).catch(function(){
+        codeInput.select();
+        showCopied();
+      });
+    } else {
+      codeInput.select();
+      try{ document.execCommand('copy'); }catch(e){}
+      showCopied();
+    }
+  });
 
   runMachineGate(function(){ show('login'); });
 
