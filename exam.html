@@ -282,6 +282,25 @@
     return nowMin >= LOGIN_WINDOW_START_MIN && nowMin < LOGIN_WINDOW_END_MIN;
   }
 
+  function todayISTDateString(){
+    var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).formatToParts(new Date());
+    var y = parts.find(function(p){return p.type==='year';}).value;
+    var m = parts.find(function(p){return p.type==='month';}).value;
+    var d = parts.find(function(p){return p.type==='day';}).value;
+    return y + '-' + m + '-' + d;
+  }
+
+  function formatDateLabel(isoDate){
+    if (!isoDate) return '';
+    var d = new Date(isoDate + 'T00:00:00Z');
+    return d.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric', timeZone:'UTC' });
+  }
+
+  function isCorrectExamDate(assignment){
+    if (!assignment.examDate) return true; // null examDate (e.g. QA) = any day
+    return todayISTDateString() === assignment.examDate;
+  }
+
   var screens = {
     blocked: document.getElementById('screen-blocked'),
     login: document.getElementById('screen-login'),
@@ -483,6 +502,11 @@
 
     var localProgress = loadProgress(email);
     var isResuming = localProgress && !localProgress.done;
+
+    if (!isResuming && !isCorrectExamDate(assignment)){
+      setLoginError('Your scheduled exam date is ' + formatDateLabel(assignment.examDate) + '. You cannot log in on any other day.');
+      return;
+    }
     if (!isResuming && !isWithinLoginWindow()){
       setLoginError('Login is only open from ' + LOGIN_WINDOW_LABEL + ' IST. You are outside this window and cannot start the exam.');
       return;
