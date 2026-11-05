@@ -6,7 +6,7 @@
 
 var SHEET_NAME = 'Results';
 var HEADERS = [
-  'name','employeeId','email','set','total','correct','wrong','unanswered',
+  'name','examCode','email','set','total','correct','wrong','unanswered',
   'percent','pass','startedAt','submittedAt','durationSeconds','durationLabel',
   'autoSubmitted','submitted','answersJson'
 ];

@@ -183,8 +183,8 @@
     <label for="inName">Full Name</label>
     <input type="text" id="inName" placeholder="e.g. Aditya Patil" autocomplete="name">
 
-    <label for="inEmpId">Employee ID</label>
-    <input type="text" id="inEmpId" placeholder="e.g. RR-1042" autocomplete="off">
+    <label for="inExamCode">Exam Code</label>
+    <input type="text" id="inExamCode" placeholder="e.g. RRCAD-XXXX-XXXX" autocomplete="off">
 
     <label for="inEmail">Email Address</label>
     <input type="email" id="inEmail" placeholder="e.g. aditya.patil@rrglobal.com" autocomplete="email">
@@ -294,10 +294,13 @@
     cb();
   }
 
-  function findAssignment(email){
+  function normCode(c){ return (c||'').trim().toUpperCase(); }
+
+  function findAssignmentByCode(email, code){
     var e = normEmail(email);
+    var c = normCode(code);
     for (var i=0;i<ASSIGNMENTS.length;i++){
-      if (ASSIGNMENTS[i].email === e) return ASSIGNMENTS[i];
+      if (ASSIGNMENTS[i].email === e && normCode(ASSIGNMENTS[i].code) === c) return ASSIGNMENTS[i];
     }
     return null;
   }
@@ -332,7 +335,7 @@
   }
 
   // ---------------- state ----------------
-  var state = null; // { name, employeeId, email, set, questions, answers[], startedAt, deadline }
+  var state = null; // { name, examCode, email, set, questions, answers[], startedAt, deadline }
   var STORAGE_KEY_PREFIX = 'rrlisp_exam_v1_';
 
   function storageKey(email){ return STORAGE_KEY_PREFIX + normEmail(email); }
@@ -340,7 +343,7 @@
   function saveProgress(){
     try{
       localStorage.setItem(storageKey(state.email), JSON.stringify({
-        name: state.name, employeeId: state.employeeId, email: state.email,
+        name: state.name, examCode: state.examCode, email: state.email,
         set: state.set, answers: state.answers, startedAt: state.startedAt,
         deadline: state.deadline, done: !!state.done, result: state.result || null
       }));
@@ -433,20 +436,20 @@
 
   document.getElementById('btnStart').addEventListener('click', function(){
     var name = document.getElementById('inName').value.trim();
-    var empId = document.getElementById('inEmpId').value.trim();
+    var examCode = document.getElementById('inExamCode').value.trim();
     var email = document.getElementById('inEmail').value.trim();
 
-    if (!name || !empId || !email){
-      setLoginError('Please fill in your name, employee ID, and email.');
+    if (!name || !examCode || !email){
+      setLoginError('Please fill in your name, exam code, and email.');
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
       setLoginError('Please enter a valid email address.');
       return;
     }
-    var assignment = findAssignment(email);
+    var assignment = findAssignmentByCode(email, examCode);
     if (!assignment){
-      setLoginError('This email is not on the exam roster. Check with the CAD Automation team if you believe this is an error.');
+      setLoginError('That exam code and email do not match our records. Check with the CAD Automation team if you believe this is an error.');
       return;
     }
     setLoginError(null);
@@ -471,7 +474,7 @@
 
       startExam({
         name: name,
-        employeeId: empId,
+        examCode: examCode,
         email: email,
         set: assignment.set,
         resume: (local && !local.done) ? local : null
@@ -501,7 +504,7 @@
   function startExam(opts){
     if (opts.resume){
       state = {
-        name: opts.resume.name, employeeId: opts.resume.employeeId, email: opts.resume.email,
+        name: opts.resume.name, examCode: opts.resume.examCode, email: opts.resume.email,
         set: opts.resume.set,
         questions: buildExamQuestions(opts.resume.set, normEmail(opts.resume.email)),
         answers: opts.resume.answers || [],
@@ -511,7 +514,7 @@
     } else {
       var now = Date.now();
       state = {
-        name: opts.name, employeeId: opts.employeeId, email: opts.email,
+        name: opts.name, examCode: opts.examCode, email: opts.email,
         set: opts.set,
         questions: buildExamQuestions(opts.set, normEmail(opts.email)),
         answers: new Array((SETS[opts.set]||[]).length).fill(null),
@@ -634,7 +637,7 @@
     var durationLabel = dm + 'm ' + ds + 's';
 
     var result = {
-      name: state.name, employeeId: state.employeeId, email: normEmail(state.email),
+      name: state.name, examCode: state.examCode, email: normEmail(state.email),
       set: state.set, total: total, correct: correct, wrong: wrong, unanswered: unanswered,
       percent: percent, pass: percent >= PASS_PCT,
       startedAt: state.startedAt, submittedAt: Date.now(), durationSeconds: durationSec,
