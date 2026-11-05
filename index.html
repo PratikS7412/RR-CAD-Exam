@@ -244,7 +244,7 @@
       <label>Your Exam Code</label>
       <div style="display:flex; gap:8px;">
         <input type="text" id="schCode" readonly style="font-family:ui-monospace,Consolas,monospace; font-weight:700; letter-spacing:.5px;">
-        <button class="btn" id="btnCopyCode" type="button" style="flex:0 0 auto; padding:11px 16px;">Copy</button>
+        <button class="btn" id="btnCopyCode" type="button" style="flex:0 0 auto; padding:11px 16px;">Append</button>
       </div>
       <p class="hint">Keep this code private. You will need it, along with your name and email, to log in on your scheduled date.</p>
     </div>
@@ -920,24 +920,14 @@
   });
 
   document.getElementById('btnCopyCode').addEventListener('click', function(){
-    var codeInput = document.getElementById('schCode');
-    var btn = document.getElementById('btnCopyCode');
-    var text = codeInput.value;
-    function showCopied(){
-      var original = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(function(){ btn.textContent = original; }, 1500);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(showCopied).catch(function(){
-        codeInput.select();
-        showCopied();
-      });
-    } else {
-      codeInput.select();
-      try{ document.execCommand('copy'); }catch(e){}
-      showCopied();
-    }
+    var name = document.getElementById('schName').value;
+    var code = document.getElementById('schCode').value;
+    var assignment = findAssignmentByName(name);
+    document.getElementById('inName').value = name;
+    document.getElementById('inEmail').value = assignment ? assignment.email : '';
+    document.getElementById('inExamCode').value = code;
+    setLoginError(null);
+    show('login');
   });
 
   runMachineGate(function(){ show('login'); });
